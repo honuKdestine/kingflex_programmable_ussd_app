@@ -362,7 +362,7 @@ def check_transaction_status(
 ):
     """
     Returns the JSON response from Hubtel transaction status endpoint.
-    You must ensure your server IP is whitelisted for this endpoint.
+    Server IP must be whitelisted for this endpoint.
     """
     url = f"https://api-txnstatus.hubtel.com/transactions/{pos_sales_id}/status"
     params = {"clientReference": client_reference}

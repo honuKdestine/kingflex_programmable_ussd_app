@@ -42,6 +42,7 @@ class Transaction(models.Model):
     status = models.CharField(
         max_length=32, default="pending"
     )  # pending/success/failed
+    mobile = models.CharField()
     extra = models.JSONField(default=dict, blank=True)  # store response payloads
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

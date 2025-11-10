@@ -18,8 +18,14 @@ class USSDSessionAdmin(admin.ModelAdmin):
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ("id", "session", "amount_cents", "status", "order_id", "created_at")
+    list_display = (
+        "id",
+        "session",
+        "amount_cents",
+        "mobile",
+        "status",
+        "order_id",
+        "created_at",
+    )
     readonly_fields = ("created_at", "updated_at")
-    search_fields = ("order_id", "client_reference")
-
-    
+    search_fields = ("order_id", "client_reference", "mobile")
