@@ -1,0 +1,39 @@
+# Django stuff
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
+
+# Environment
+venv/
+.env
+.env.*
+*.env
+
+# IDE and system files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Pytest / coverage / build files
+htmlcov/
+.coverage
+.tox/
+.dist/
+build/
+develop-eggs/
+.eggs/
+*.egg-info/
+.eggs-info/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
