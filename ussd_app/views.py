@@ -270,36 +270,86 @@ def fulfillment(request):
         payload = json.loads(request.body.decode())
     except Exception:
         payload = request.POST.dict()
+
     logger.info("Fulfillment inbound: %s", payload)
-    # Payload contains SessionId, OrderId, OrderInfo with Status, Payment etc.
+
     session_id = payload.get("SessionId")
     order_id = payload.get("OrderId")
-    # OrderInfo nested
     order_info = payload.get("OrderInfo", {})
-    status = order_info.get("Status") or (payload.get("ServiceStatus"))
-    # find transaction by clientReference or session
+    status = (order_info.get("Status") or payload.get("ServiceStatus") or "").lower()
+
     try:
         tx = (
             Transaction.objects.filter(client_reference=session_id)
             .order_by("-created_at")
             .first()
         )
+
         if not tx:
             logger.warning("No transaction found for session %s", session_id)
+            return JsonResponse({"error": "Transaction not found"}, status=404)
+
+        # Mark transaction result
+        if status == "paid":
+            tx.order_id = order_id
+            tx.status = "success"
+            tx.extra.update({"order_info": order_info})
+            tx.save()
+
+            # Prepare Hubtel callback payload
+            callback_payload = {
+                "OrderId": order_id,
+                "ServiceStatus": "success",
+                "Message": "Service delivered successfully",
+            }
+
+            callback_url = "https://gs-callback.hubtel.com:9055/callback"
+            # callback_url = "https://webhook.site/af6f4284-0845-45ef-8b29-1bc44dcc21d4"
+
+            # Attempt callback with retry logic
+            for attempt in range(3):
+                try:
+                    response = requests.post(
+                        callback_url,
+                        json=callback_payload,
+                        timeout=10,
+                        headers={"Content-Type": "application/json"},
+                    )
+                    logger.info(
+                        "Callback attempt %s to Hubtel: %s",
+                        attempt + 1,
+                        response.text,
+                    )
+                    if response.status_code == 200:
+                        break  # success, no need to retry
+                except Exception as e:
+                    logger.error("Callback attempt %s failed: %s", attempt + 1, str(e))
+                    if attempt == 2:
+                        logger.critical(
+                            "All callback attempts failed for order %s", order_id
+                        )
+
         else:
-            if status and status.lower() == "paid":
-                tx.order_id = order_id
-                tx.status = "success"
-                tx.extra.update({"order_info": order_info})
-                tx.save()
-                # call Hubtel callback endpoint to confirm service fulfillment
-                # callback to https://gs-callback.hubtel.com:9055/callback
-                # required to POST within 1 hour with ServiceStatus success/failed
-                # We'll not call that external URL here; instead we return 200 OK and record the payment.
-            else:
-                tx.status = "failed"
-                tx.extra.update({"order_info": order_info})
-                tx.save()
+            tx.status = "failed"
+            tx.extra.update({"order_info": order_info})
+            tx.save()
+
+            # Optional: notify Hubtel of failed service (optional)
+            failed_payload = {
+                "OrderId": order_id,
+                "ServiceStatus": "failed",
+                "Message": "Payment received but service failed to deliver",
+            }
+            try:
+                requests.post(
+                    "https://gs-callback.hubtel.com:9055/callback",
+                    # "https://webhook.site/af6f4284-0845-45ef-8b29-1bc44dcc21d4",
+                    json=failed_payload,
+                    timeout=10,
+                )
+            except Exception as e:
+                logger.warning("Failed to send failure callback: %s", e)
+
     except Exception as e:
         logger.exception("Error processing fulfillment: %s", e)
 
