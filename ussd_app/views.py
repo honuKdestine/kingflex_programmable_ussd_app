@@ -92,7 +92,7 @@ def interaction(request):
                 resp = {
                     "SessionId": session_id,
                     "Type": "response",
-                    "Message": "Enter number of checkers you want to buy",
+                    "Message": "Enter number of checkers you want to buy (eg. 1)",
                     "Label": "Quantity",
                     "ClientState": "",
                     "DataType": "input",
