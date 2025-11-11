@@ -67,7 +67,7 @@ def interaction(request):
         response = {
             "SessionId": session_id,
             "Type": "response",
-            "Message": "Welcome to Kingsflex Enterprise Services\n1. Buy WASSCE Results Checker\n2. Exit",
+            "Message": "Welcome to Jel Services\n1. Buy WASSCE Results Checker\n2. Exit",
             "Label": "Main Menu",
             "ClientState": "",  # optional
             "DataType": "input",
