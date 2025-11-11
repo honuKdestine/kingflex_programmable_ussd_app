@@ -30,7 +30,11 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "False") == "True"
 POS_SALES_ID = os.getenv("POS_SALES_ID")
 
-ALLOWED_HOSTS = ["https://kingflex-ussd-app.onrender.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "kingflex-wasscechecker-ussd-app.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
