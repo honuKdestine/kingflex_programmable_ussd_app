@@ -28,18 +28,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "True") == "False"
+DEBUG = os.getenv("DEBUG", "False") == "False"
 POS_SALES_ID = os.getenv("POS_SALES_ID")
 
-# ALLOWED_HOSTS = [
-#     ".railway.app",
-#     "localhost",
-#     "127.0.0.1",
-#     "52.50.116.54",
-#     "18.202.122.131",
-#     "52.31.15.68",
-# ]
-ALLOWED_HOSTS = ["*", ".railway.app"]
+ALLOWED_HOSTS = [
+    "jelcheckers-ussd.onrender.com",
+    "localhost",
+    "127.0.0.1",
+    "52.50.116.54",
+    "18.202.122.131",
+    "52.31.15.68",
+]
 
 
 # Application definition
