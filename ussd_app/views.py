@@ -304,7 +304,6 @@ def fulfillment(request):
             }
 
             callback_url = "https://gs-callback.hubtel.com:9055/callback"
-            # callback_url = "https://webhook.site/af6f4284-0845-45ef-8b29-1bc44dcc21d4"
 
             # Attempt callback with retry logic
             for attempt in range(3):
@@ -343,7 +342,6 @@ def fulfillment(request):
             try:
                 requests.post(
                     "https://gs-callback.hubtel.com:9055/callback",
-                    # "https://webhook.site/af6f4284-0845-45ef-8b29-1bc44dcc21d4",
                     json=failed_payload,
                     timeout=10,
                 )
