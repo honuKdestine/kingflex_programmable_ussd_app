@@ -31,9 +31,12 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 POS_SALES_ID = os.getenv("POS_SALES_ID")
 
 ALLOWED_HOSTS = [
-    "kingflex-wasscechecker-ussd-app.onrender.com",
+    "jelcheckers-ussd.onrender.com",
     "localhost",
     "127.0.0.1",
+    "52.50.116.54",
+    "18.202.122.131",
+    "52.31.15.68",
 ]
 
 
