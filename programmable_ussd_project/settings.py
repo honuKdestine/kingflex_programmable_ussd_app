@@ -36,10 +36,8 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 POS_SALES_ID = os.getenv("POS_SALES_ID")
 
 ALLOWED_HOSTS = [
-    ".fly.dev",
     "ussd-project-kingflex.fly.dev",
-    "*",
-    "127.0.0.1:8000",
+    "127.0.0.1",
     "52.50.116.54",
     "18.202.122.131",
     "52.31.15.68",
@@ -66,8 +64,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
+
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 ROOT_URLCONF = "programmable_ussd_project.urls"
 
