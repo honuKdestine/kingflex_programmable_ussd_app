@@ -32,9 +32,10 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 POS_SALES_ID = os.getenv("POS_SALES_ID")
 
 ALLOWED_HOSTS = [
-    "jelcheckers-ussd.onrender.com",
-    "localhost",
-    "127.0.0.1",
+    ".fly.dev",
+    "ussd-project-kingflex.fly.dev",
+    "*",
+    "127.0.0.1:8000",
     "52.50.116.54",
     "18.202.122.131",
     "52.31.15.68",
