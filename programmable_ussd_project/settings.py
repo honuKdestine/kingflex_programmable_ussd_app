@@ -22,6 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 CSRF_TRUSTED_ORIGINS = [
     "https://ussd-project-kingflex.fly.dev",
+    "https://katelyn-penciliform-maple.ngrok-free.dev",
 ]
 
 
@@ -38,10 +39,13 @@ POS_SALES_ID = os.getenv("POS_SALES_ID")
 ALLOWED_HOSTS = [
     "ussd-project-kingflex.fly.dev",
     "127.0.0.1",
-    "52.50.116.54",
-    "18.202.122.131",
-    "52.31.15.68",
+    "localhost",
+    "*",
+    "jelcheckers-ussd.onrender.com",
 ]
+# "52.50.116.54",
+# "18.202.122.131",
+# "52.31.15.68",
 
 
 # Application definition
@@ -64,10 +68,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "whitenoise.middleware.WhiteNoiseMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
-MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+# MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 ROOT_URLCONF = "programmable_ussd_project.urls"
 
@@ -136,6 +140,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+# STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 # Default primary key field type
