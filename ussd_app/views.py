@@ -1,7 +1,6 @@
 # from venv import logger
 from django.shortcuts import render
 import json
-import os
 import logging
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -10,8 +9,24 @@ from django.shortcuts import get_object_or_404
 from .models import USSDSession, Price, Transaction
 import requests
 from django.conf import settings
+from dotenv import load_dotenv
+
+load_dotenv()
+import os
 
 logger = logging.getLogger(__name__)
+
+
+def get_proxies():
+    proxy_url = os.environ.get("QUOTAGUARD_URL")
+    if not proxy_url:
+        return None  # fail gracefully in local dev
+    return {
+        "http": proxy_url,
+        "https": proxy_url,
+    }
+
+
 # Create your views here.
 
 
@@ -314,6 +329,7 @@ def fulfillment(request):
                         json=callback_payload,
                         timeout=10,
                         headers={"Content-Type": "application/json"},
+                        proxies=get_proxies(),
                     )
                     logger.info(
                         "Callback attempt %s to Hubtel: %s",
@@ -346,6 +362,7 @@ def fulfillment(request):
                     # "https://webhook.site/af6f4284-0845-45ef-8b29-1bc44dcc21d4",
                     json=failed_payload,
                     timeout=10,
+                    proxies=get_proxies(),
                 )
             except Exception as e:
                 logger.warning("Failed to send failure callback: %s", e)
@@ -383,7 +400,12 @@ def check_transaction_status(client_reference):
     params = {"clientReference": client_reference}
 
     try:
-        resp = requests.get(url, params=params, timeout=15)
+        resp = requests.get(
+            url,
+            params=params,
+            timeout=15,
+            proxies=get_proxies(),
+        )
         resp.raise_for_status()
         return resp.json()
     except Exception as e:

@@ -21,8 +21,9 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://ussd-project-kingflex.fly.dev",
-    "https://katelyn-penciliform-maple.ngrok-free.dev",
+    # "https://ussd-project-kingflex.fly.dev",
+    # "https://katelyn-penciliform-maple.ngrok-free.dev",
+    "https://jelcheckers-ussd.onrender.com",
 ]
 
 
@@ -37,15 +38,14 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 POS_SALES_ID = os.getenv("POS_SALES_ID")
 
 ALLOWED_HOSTS = [
-    "ussd-project-kingflex.fly.dev",
+    # "ussd-project-kingflex.fly.dev",
     "127.0.0.1",
     "localhost",
-    "*",
     "jelcheckers-ussd.onrender.com",
+    "52.50.116.54",
+    "18.202.122.131",
+    "52.31.15.68",
 ]
-# "52.50.116.54",
-# "18.202.122.131",
-# "52.31.15.68",
 
 
 # Application definition
