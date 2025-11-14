@@ -23,5 +23,5 @@ from django.http import HttpResponse
 urlpatterns = [
     path("", lambda request: HttpResponse("Welcome to the USSD Gateway!")),
     path("admin/", admin.site.urls),
-    path("ussd_app", include("ussd_app.urls")),
+    path("ussd_app/", include("ussd_app.urls")),
 ]
