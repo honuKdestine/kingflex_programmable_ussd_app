@@ -36,8 +36,8 @@ def get_wassce_price_cents():
         price = Price.objects.get(item_code="wassce_checker", active=True)
         return price.price_cents
     except Price.DoesNotExist:
-        # default placeholder (e.g., GHS 12.00)
-        return 1200
+        # default placeholder (e.g., GHS 24.00)
+        return 2400
 
 
 @csrf_exempt
@@ -82,7 +82,7 @@ def interaction(request):
         response = {
             "SessionId": session_id,
             "Type": "response",
-            "Message": "Welcome to Jel Services\n1. Buy WASSCE Results Checker\n2. Exit",
+            "Message": "Welcome to Jel Services\n1. Buy WASSCE Results Checker\n2. Retrieve Voucher",
             "Label": "Main Menu",
             "ClientState": "",  # optional
             "DataType": "input",
@@ -114,6 +114,20 @@ def interaction(request):
                     "FieldType": "number",
                 }
                 return JsonResponse(resp)
+            elif text == "2":
+                session.step = 101
+                session.save()
+                return JsonResponse(
+                    {
+                        "SessionId": session_id,
+                        "Type": "response",
+                        "Message": "Enter your full name",
+                        "Label": "Voucher Name",
+                        "ClientState": "",
+                        "DataType": "input",
+                        "FieldType": "text",
+                    }
+                )
             else:
                 # Exit or invalid
                 session.step = 0
@@ -122,7 +136,7 @@ def interaction(request):
                     {
                         "SessionId": session_id,
                         "Type": "release",
-                        "Message": "Thank you. Goodbye.",
+                        "Message": "Thanks for using Jel Services.",
                         "Label": "Exit",
                         "DataType": "display",
                         "FieldType": "text",
@@ -196,6 +210,43 @@ def interaction(request):
             session.data["transaction_id"] = tx.id
             session.step = 5
             session.save()
+
+            # RETRIEVE VOUCHER FLOW
+            if session.step == 101:
+                # ask name
+                session.data["rv_name"] = text
+                session.step = 102
+                session.save()
+                return JsonResponse(
+                    {
+                        "SessionId": session_id,
+                        "Type": "response",
+                        "Message": "Enter your phone number",
+                        "Label": "Voucher Phone",
+                        "ClientState": "",
+                        "DataType": "input",
+                        "FieldType": "phone",
+                    }
+                )
+
+            if session.step == 102:  # ask phone number
+                session.data["rv_phone"] = text
+                session.step = 103
+                session.save()
+
+                # Store request for admin (or email/notify/DB entry)
+                logger.info("Voucher retrieval request: %s", session.data)
+
+                return JsonResponse(
+                    {
+                        "SessionId": session_id,
+                        "Type": "release",
+                        "Message": "Your request has been received.\nAdmin will verify and send your voucher shortly.",
+                        "Label": "Voucher Request Received",
+                        "DataType": "display",
+                        "FieldType": "text",
+                    }
+                )
 
             total_ghs = total_cents / 100
             return JsonResponse(
