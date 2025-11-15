@@ -15,6 +15,7 @@ load_dotenv()
 import os
 
 logger = logging.getLogger(__name__)
+log = logging.getLogger("ussd")
 
 
 def get_proxies():
@@ -88,6 +89,8 @@ def interaction(request):
             "DataType": "input",
             "FieldType": "text",
         }
+        log.info("INCOMING: %s", request.body.decode())
+        log.info("OUTGOING: %s", response)
         return JsonResponse(response)
 
     if msg_type == "Response":
@@ -113,6 +116,8 @@ def interaction(request):
                     "DataType": "input",
                     "FieldType": "number",
                 }
+                log.info("INCOMING: %s", request.body.decode())
+                log.info("OUTGOING: %s", resp)
                 return JsonResponse(resp)
             elif text == "2":
                 session.step = 101
@@ -213,10 +218,13 @@ def interaction(request):
 
             # RETRIEVE VOUCHER FLOW
             if session.step == 101:
-                # ask name
-                session.data["rv_name"] = text
+                if session.data is None:
+                    session.data = {}
+
+                session.data["rv_name"] = text  # ask name
                 session.step = 102
                 session.save()
+
                 return JsonResponse(
                     {
                         "SessionId": session_id,
@@ -230,6 +238,9 @@ def interaction(request):
                 )
 
             if session.step == 102:  # ask phone number
+                if session.data is None:
+                    session.data = {}
+
                 session.data["rv_phone"] = text
                 session.step = 103
                 session.save()

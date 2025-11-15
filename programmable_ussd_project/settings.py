@@ -38,7 +38,6 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 POS_SALES_ID = os.getenv("POS_SALES_ID")
 
 ALLOWED_HOSTS = [
-    # "ussd-project-kingflex.fly.dev",
     "127.0.0.1",
     "localhost",
     "jelcheckers-ussd.onrender.com",
@@ -59,6 +58,22 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "ussd_app",
 ]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "ussd": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+    },
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
