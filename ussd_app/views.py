@@ -135,21 +135,79 @@ def interaction(request):
                 log.info("OUTGOING: %s", resp_rv_name)
                 return JsonResponse(resp_rv_name)
 
-            # else:
-            #     # Exit or invalid
-            #     session.step = 0
-            #     session.save()
-            #     resp_exit = {
-            #         "SessionId": session_id,
-            #         "Type": "release",
-            #         "Message": "Thanks for using Jel Services.",
-            #         "Label": "Exit",
-            #         "DataType": "display",
-            #         "FieldType": "text",
-            #     }
-            #     log.info("INCOMING: %s", request.body.decode())
-            #     log.info("OUTGOING: %s", resp_exit)
-            #     return JsonResponse(resp_exit)
+            # ===================================================
+            if session.step == 101:
+                if session.data is None:
+                    session.data = {}
+
+                session.data["rv_name"] = text  # ask name
+                session.step = 102
+                session.save()
+                try:
+                    transaction = Transaction.objects.get(name=name)
+                    resp_rv_phone = {
+                        "SessionId": session_id,
+                        "Type": "response",
+                        "Message": f"Voucher found!\nName: {transaction.name}\nEnter your phone number to retrieve.",
+                        "Label": "Voucher Found",
+                        "ClientState": "retrieve_number",
+                        "DataType": "input",
+                        "FieldType": "text",
+                    }
+                    log.info("INCOMING: %s", request.body.decode())
+                    log.info("OUTGOING: %s", resp_rv_phone)
+                    return JsonResponse(resp_rv_phone)
+                except Transaction.DoesNotExist:
+                    return JsonResponse(
+                        {
+                            "SessionId": session_id,
+                            "Type": "response",
+                            "Message": "No voucher found for this name.\nPlease check and try again.",
+                            "Label": "Not Found",
+                            "ClientState": "",
+                            "DataType": "input",
+                            "FieldType": "text",
+                        }
+                    )
+            if session.step == 102:  # ask phone number
+                if session.data is None:
+                    session.data = {}
+
+                session.data["rv_phone"] = text
+                session.step = 103
+                session.save()
+
+                # Store request for admin (or email/notify/DB entry)
+                logger.info("Voucher retrieval request: %s", session.data)
+
+                resp_rv_received = {
+                    "SessionId": session_id,
+                    "Type": "release",
+                    "Message": "Your request has been received.\nAdmin will verify and send your voucher shortly.",
+                    "Label": "Voucher Request Received",
+                    "DataType": "display",
+                    "FieldType": "text",
+                }
+                log.info("INCOMING: %s", request.body.decode())
+                log.info("OUTGOING: %s", resp_rv_received)
+                return JsonResponse(resp_rv_received)
+
+        # ===============================
+        # else:
+        #     # Exit or invalid
+        #     session.step = 0
+        #     session.save()
+        #     resp_exit = {
+        #         "SessionId": session_id,
+        #         "Type": "release",
+        #         "Message": "Thanks for using Jel Services.",
+        #         "Label": "Exit",
+        #         "DataType": "display",
+        #         "FieldType": "text",
+        #     }
+        #     log.info("INCOMING: %s", request.body.decode())
+        #     log.info("OUTGOING: %s", resp_exit)
+        #     return JsonResponse(resp_exit)
 
         if session.step == 2:
             # parse quantity
@@ -222,49 +280,6 @@ def interaction(request):
             session.save()
 
             # RETRIEVE VOUCHER FLOW
-            if session.step == 101:
-                if session.data is None:
-                    session.data = {}
-
-                session.data["rv_name"] = text  # ask name
-                session.step = 102
-                session.save()
-
-                resp_rv_phone = {
-                    "SessionId": session_id,
-                    "Type": "response",
-                    "Message": "Enter your phone number",
-                    "Label": "Voucher Phone",
-                    "ClientState": "",
-                    "DataType": "input",
-                    "FieldType": "phone",
-                }
-                log.info("INCOMING: %s", request.body.decode())
-                log.info("OUTGOING: %s", resp_rv_phone)
-                return JsonResponse(resp_rv_phone)
-
-            if session.step == 102:  # ask phone number
-                if session.data is None:
-                    session.data = {}
-
-                session.data["rv_phone"] = text
-                session.step = 103
-                session.save()
-
-                # Store request for admin (or email/notify/DB entry)
-                logger.info("Voucher retrieval request: %s", session.data)
-
-                resp_rv_received = {
-                    "SessionId": session_id,
-                    "Type": "release",
-                    "Message": "Your request has been received.\nAdmin will verify and send your voucher shortly.",
-                    "Label": "Voucher Request Received",
-                    "DataType": "display",
-                    "FieldType": "text",
-                }
-                log.info("INCOMING: %s", request.body.decode())
-                log.info("OUTGOING: %s", resp_rv_received)
-                return JsonResponse(resp_rv_received)
 
             total_ghs = total_cents / 100
             resp_confirm = {
