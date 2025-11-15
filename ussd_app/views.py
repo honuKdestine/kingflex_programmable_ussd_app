@@ -241,7 +241,7 @@ def interaction(request):
             log.info("OUTGOING: %s", resp_confirm)
             return JsonResponse(resp_confirm)
 
-        # --- Voucher retrieval flow handlers (name -> phone -> lookup) ---
+        # --- Voucher Retrieval Flow Handlers (name -> phone -> lookup) ---
         if session.step == 101:
             # user has been asked to enter full name for voucher retrieval
             session.data = session.data or {}
@@ -323,12 +323,14 @@ def interaction(request):
                 resp_rv_received = {
                     "SessionId": session_id,
                     "Type": "release",
-                    "Message": "We found a matching payment record.\nAdmin has been notified via the admin panel and will send your voucher shortly.",
+                    "Message": "Found a match.\nVoucher will be sent shortly.",
                     "Label": "Voucher Request Received",
                     "DataType": "display",
                     "FieldType": "text",
                 }
-                log.info("Voucher retrieval logged (matched) id=%s tx=%s", rr.id, found_tx.id)
+                log.info(
+                    "Voucher retrieval logged (matched) id=%s tx=%s", rr.id, found_tx.id
+                )
                 log.info("INCOMING: %s", request.body.decode())
                 log.info("OUTGOING: %s", resp_rv_received)
                 return JsonResponse(resp_rv_received)
@@ -346,12 +348,17 @@ def interaction(request):
                 resp_no_record = {
                     "SessionId": session_id,
                     "Type": "release",
-                    "Message": "No payment record found for the details provided.\nIf you believe you paid, please contact admin.",
+                    "Message": "No payment record found.\nPlease contact admin.",
                     "Label": "No Record Found",
                     "DataType": "display",
                     "FieldType": "text",
                 }
-                log.info("Voucher retrieval logged (no match) id=%s name=%s phone=%s", rr.id, rv_name, rv_phone)
+                log.info(
+                    "Voucher retrieval logged (no match) id=%s name=%s phone=%s",
+                    rr.id,
+                    rv_name,
+                    rv_phone,
+                )
                 log.info("INCOMING: %s", request.body.decode())
                 log.info("OUTGOING: %s", resp_no_record)
                 return JsonResponse(resp_no_record)

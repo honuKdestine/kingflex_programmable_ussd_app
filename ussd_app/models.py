@@ -8,7 +8,7 @@ class Price(models.Model):
     active = models.BooleanField(default=True)
 
     def price_ghs(self):
-        return self.price_cents / 100
+        return self.price_cents / 100 
 
     def __str__(self):
         return f"{self.item_code} @ {self.price_ghs():.2f} GHS"
