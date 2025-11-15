@@ -52,3 +52,27 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"TX {self.id} {self.status} {self.amount_ghs():.2f} GHS"
+
+
+class RetrievalRequest(models.Model):
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("matched", "Matched"),
+        ("no_record", "No Record Found"),
+    )
+
+    session = models.ForeignKey(USSDSession, on_delete=models.SET_NULL, null=True, blank=True)
+    name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=64)
+    matched_transaction = models.ForeignKey(
+        Transaction, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    status = models.CharField(max_length=32, choices=STATUS_CHOICES, default="pending")
+    notes = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return f"RetrievalRequest {self.id} {self.name} {self.phone} {self.status}"

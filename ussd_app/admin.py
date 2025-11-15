@@ -1,5 +1,5 @@
 from django.contrib import admin, messages
-from .models import Price, USSDSession, Transaction
+from .models import Price, USSDSession, Transaction, RetrievalRequest
 from django.utils.html import format_html
 from django.urls import path
 from django.shortcuts import redirect
@@ -111,3 +111,11 @@ class TransactionAdmin(admin.ModelAdmin):
             )
 
         return redirect(f"../../{transaction_id}/change/")
+
+
+@admin.register(RetrievalRequest)
+class RetrievalRequestAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "phone", "status", "matched_transaction", "created_at")
+    readonly_fields = ("created_at",)
+    list_filter = ("status",)
+    search_fields = ("name", "phone")
