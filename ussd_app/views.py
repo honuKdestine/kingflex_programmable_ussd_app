@@ -135,21 +135,21 @@ def interaction(request):
                 log.info("OUTGOING: %s", resp_rv_name)
                 return JsonResponse(resp_rv_name)
 
-            else:
-                # Exit or invalid
-                session.step = 0
-                session.save()
-                resp_exit = {
-                    "SessionId": session_id,
-                    "Type": "release",
-                    "Message": "Thanks for using Jel Services.",
-                    "Label": "Exit",
-                    "DataType": "display",
-                    "FieldType": "text",
-                }
-                log.info("INCOMING: %s", request.body.decode())
-                log.info("OUTGOING: %s", resp_exit)
-                return JsonResponse(resp_exit)
+            # else:
+            #     # Exit or invalid
+            #     session.step = 0
+            #     session.save()
+            #     resp_exit = {
+            #         "SessionId": session_id,
+            #         "Type": "release",
+            #         "Message": "Thanks for using Jel Services.",
+            #         "Label": "Exit",
+            #         "DataType": "display",
+            #         "FieldType": "text",
+            #     }
+            #     log.info("INCOMING: %s", request.body.decode())
+            #     log.info("OUTGOING: %s", resp_exit)
+            #     return JsonResponse(resp_exit)
 
         if session.step == 2:
             # parse quantity
