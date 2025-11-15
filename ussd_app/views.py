@@ -122,31 +122,34 @@ def interaction(request):
             elif text == "2":
                 session.step = 101
                 session.save()
-                return JsonResponse(
-                    {
-                        "SessionId": session_id,
-                        "Type": "response",
-                        "Message": "Enter your full name",
-                        "Label": "Voucher Name",
-                        "ClientState": "",
-                        "DataType": "input",
-                        "FieldType": "text",
-                    }
-                )
+                resp_rv_name = {
+                    "SessionId": session_id,
+                    "Type": "response",
+                    "Message": "Enter your full name",
+                    "Label": "Voucher Name",
+                    "ClientState": "",
+                    "DataType": "input",
+                    "FieldType": "text",
+                }
+                log.info("INCOMING: %s", request.body.decode())
+                log.info("OUTGOING: %s", resp_rv_name)
+                return JsonResponse(resp_rv_name)
+
             else:
                 # Exit or invalid
                 session.step = 0
                 session.save()
-                return JsonResponse(
-                    {
-                        "SessionId": session_id,
-                        "Type": "release",
-                        "Message": "Thanks for using Jel Services.",
-                        "Label": "Exit",
-                        "DataType": "display",
-                        "FieldType": "text",
-                    }
-                )
+                resp_exit = {
+                    "SessionId": session_id,
+                    "Type": "release",
+                    "Message": "Thanks for using Jel Services.",
+                    "Label": "Exit",
+                    "DataType": "display",
+                    "FieldType": "text",
+                }
+                log.info("INCOMING: %s", request.body.decode())
+                log.info("OUTGOING: %s", resp_exit)
+                return JsonResponse(resp_exit)
 
         if session.step == 2:
             # parse quantity
@@ -169,34 +172,36 @@ def interaction(request):
             session.data["qty"] = qty
             session.step = 3
             session.save()
-            return JsonResponse(
-                {
-                    "SessionId": session_id,
-                    "Type": "response",
-                    "Message": "Enter your full name",
-                    "Label": "Name",
-                    "ClientState": "",
-                    "DataType": "input",
-                    "FieldType": "text",
-                }
-            )
+            resp_name = {
+                "SessionId": session_id,
+                "Type": "response",
+                "Message": "Enter your full name",
+                "Label": "Name",
+                "ClientState": "",
+                "DataType": "input",
+                "FieldType": "text",
+            }
+            log.info("INCOMING: %s", request.body.decode())
+            log.info("OUTGOING: %s", resp_name)
+            return JsonResponse(resp_name)
 
         if session.step == 3:
             name = text
             session.data["name"] = name
             session.step = 4
             session.save()
-            return JsonResponse(
-                {
-                    "SessionId": session_id,
-                    "Type": "response",
-                    "Message": "Enter your phone number",
-                    "Label": "Phone",
-                    "ClientState": "",
-                    "DataType": "input",
-                    "FieldType": "phone",
-                }
-            )
+            resp_phone = {
+                "SessionId": session_id,
+                "Type": "response",
+                "Message": "Enter your phone number",
+                "Label": "Phone",
+                "ClientState": "",
+                "DataType": "input",
+                "FieldType": "phone",
+            }
+            log.info("INCOMING: %s", request.body.decode())
+            log.info("OUTGOING: %s", resp_phone)
+            return JsonResponse(resp_phone)
 
         if session.step == 4:
             receiver_phone = text
@@ -225,17 +230,18 @@ def interaction(request):
                 session.step = 102
                 session.save()
 
-                return JsonResponse(
-                    {
-                        "SessionId": session_id,
-                        "Type": "response",
-                        "Message": "Enter your phone number",
-                        "Label": "Voucher Phone",
-                        "ClientState": "",
-                        "DataType": "input",
-                        "FieldType": "phone",
-                    }
-                )
+                resp_rv_phone = {
+                    "SessionId": session_id,
+                    "Type": "response",
+                    "Message": "Enter your phone number",
+                    "Label": "Voucher Phone",
+                    "ClientState": "",
+                    "DataType": "input",
+                    "FieldType": "phone",
+                }
+                log.info("INCOMING: %s", request.body.decode())
+                log.info("OUTGOING: %s", resp_rv_phone)
+                return JsonResponse(resp_rv_phone)
 
             if session.step == 102:  # ask phone number
                 if session.data is None:
@@ -248,29 +254,31 @@ def interaction(request):
                 # Store request for admin (or email/notify/DB entry)
                 logger.info("Voucher retrieval request: %s", session.data)
 
-                return JsonResponse(
-                    {
-                        "SessionId": session_id,
-                        "Type": "release",
-                        "Message": "Your request has been received.\nAdmin will verify and send your voucher shortly.",
-                        "Label": "Voucher Request Received",
-                        "DataType": "display",
-                        "FieldType": "text",
-                    }
-                )
+                resp_rv_received = {
+                    "SessionId": session_id,
+                    "Type": "release",
+                    "Message": "Your request has been received.\nAdmin will verify and send your voucher shortly.",
+                    "Label": "Voucher Request Received",
+                    "DataType": "display",
+                    "FieldType": "text",
+                }
+                log.info("INCOMING: %s", request.body.decode())
+                log.info("OUTGOING: %s", resp_rv_received)
+                return JsonResponse(resp_rv_received)
 
             total_ghs = total_cents / 100
-            return JsonResponse(
-                {
-                    "SessionId": session_id,
-                    "Type": "response",
-                    "Message": f"Confirm purchase of {qty} WASSCE checker(s) for GHS {total_ghs:.2f}\n1. Confirm\n2. Cancel",
-                    "Label": "Confirm Purchase",
-                    "ClientState": "",
-                    "DataType": "input",
-                    "FieldType": "number",
-                }
-            )
+            resp_confirm = {
+                "SessionId": session_id,
+                "Type": "response",
+                "Message": f"Confirm purchase of {qty} WASSCE checker(s) for GHS {total_ghs:.2f}\n1. Confirm\n2. Cancel",
+                "Label": "Confirm Purchase",
+                "ClientState": "",
+                "DataType": "input",
+                "FieldType": "number",
+            }
+            log.info("INCOMING: %s", request.body.decode())
+            log.info("OUTGOING: %s", resp_confirm)
+            return JsonResponse(resp_confirm)
 
         if session.step == 5:
             if text == "1":
@@ -287,56 +295,60 @@ def interaction(request):
                 tx.extra = {"initiated_by": mobile}
                 tx.save()
                 # Hubtel will now present the checkout (user will make payment) and upon success call Service Fulfillment URL.
-                return JsonResponse(
-                    {
-                        "SessionId": session_id,
-                        "Type": "AddToCart",
-                        "Message": "The request has been submitted. Please wait for a payment prompt soon",
-                        "Item": item,
-                        "Label": "Proceed to payment",
-                        "DataType": "display",
-                        "FieldType": "text",
-                    }
-                )
+                resp_payment = {
+                    "SessionId": session_id,
+                    "Type": "AddToCart",
+                    "Message": "The request has been submitted. Please wait for a payment prompt soon",
+                    "Item": item,
+                    "Label": "Proceed to payment",
+                    "DataType": "display",
+                    "FieldType": "text",
+                }
+                log.info("INCOMING: %s", request.body.decode())
+                log.info("OUTGOING: %s", resp_payment)
+                return JsonResponse(resp_payment)
             else:
                 session.step = 0
                 session.save()
-                return JsonResponse(
-                    {
-                        "SessionId": session_id,
-                        "Type": "release",
-                        "Message": "Transaction cancelled.",
-                        "Label": "Cancelled",
-                        "DataType": "display",
-                        "FieldType": "text",
-                    }
-                )
+                resp_payment_cancelled = {
+                    "SessionId": session_id,
+                    "Type": "release",
+                    "Message": "Transaction cancelled.",
+                    "Label": "Cancelled",
+                    "DataType": "display",
+                    "FieldType": "text",
+                }
+                log.info("INCOMING: %s", request.body.decode())
+                log.info("OUTGOING: %s", resp_payment_cancelled)
+                return JsonResponse(resp_payment_cancelled)
 
     if msg_type == "Timeout":
         session.step = 0
         session.save()
-        return JsonResponse(
-            {
-                "SessionId": session_id,
-                "Type": "release",
-                "Message": "Session timed out.",
-                "Label": "Timeout",
-                "DataType": "display",
-                "FieldType": "text",
-            }
-        )
-
-    # default fallback
-    return JsonResponse(
-        {
+        resp_payment_timedout = {
             "SessionId": session_id,
             "Type": "release",
-            "Message": "An error occurred.",
-            "Label": "Error",
+            "Message": "Session timed out.",
+            "Label": "Timeout",
             "DataType": "display",
             "FieldType": "text",
         }
-    )
+        log.info("INCOMING: %s", request.body.decode())
+        log.info("OUTGOING: %s", resp_payment_timedout)
+        return JsonResponse(resp_payment_timedout)
+
+    # default fallback
+    resp_payment_error = {
+        "SessionId": session_id,
+        "Type": "release",
+        "Message": "An error occurred.",
+        "Label": "Error",
+        "DataType": "display",
+        "FieldType": "text",
+    }
+    log.info("INCOMING: %s", request.body.decode())
+    log.info("OUTGOING: %s", resp_payment_error)
+    return JsonResponse(resp_payment_error)
 
 
 @csrf_exempt
