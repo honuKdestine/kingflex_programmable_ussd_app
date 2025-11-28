@@ -530,31 +530,40 @@ def fulfillment(request):
     return JsonResponse({"ok": True})
 
 
-# Mandatory: Utility to call Hubtel transaction status endpoint if you don't get fulfillment
-# def check_transaction_status(
-#     pos_sales_id, client_reference, auth_username, auth_password
-# ):
+# def check_transaction_status(client_reference):
 #     """
 #     Returns the JSON response from Hubtel transaction status endpoint.
-#     Server IP must be whitelisted for this endpoint.
+#     Uses the POS_SALES_ID from environment variables.
 #     """
-#     pos_sales_id = settings
+#     pos_sales_id = settings.POS_SALES_ID
 #     url = f"https://api-txnstatus.hubtel.com/transactions/{pos_sales_id}/status"
 #     params = {"clientReference": client_reference}
-#     auth = (auth_username, auth_password)
-#     resp = requests.get(url, params=params, auth=auth, timeout=15)
-#     resp.raise_for_status()
-#     return resp.json()
+
+#     try:
+#         resp = requests.get(
+#             url,
+#             params=params,
+#             timeout=15,
+#             proxies=get_proxies(),
+#         )
+#         resp.raise_for_status()
+#         return resp.json()
+#     except Exception as e:
+#         logger.error("Error checking transaction status: %s", e)
+#         return {"error": str(e)}
+
 
 
 def check_transaction_status(client_reference):
     """
     Returns the JSON response from Hubtel transaction status endpoint.
-    Uses the POS_SALES_ID from environment variables.
     """
     pos_sales_id = settings.POS_SALES_ID
     url = f"https://api-txnstatus.hubtel.com/transactions/{pos_sales_id}/status"
     params = {"clientReference": client_reference}
+
+    # Log INCOMING request (same pattern as your USSD INCOMING)
+    logger.info("INCOMING (STATUS CHECK): %s - Params: %s", url, params)
 
     try:
         resp = requests.get(
@@ -563,8 +572,17 @@ def check_transaction_status(client_reference):
             timeout=15,
             proxies=get_proxies(),
         )
+
+        # Log OUTGOING raw response
+        try:
+            logger.info("OUTGOING (STATUS CHECK): %s", resp.text)
+        except Exception:
+            logger.info("OUTGOING (STATUS CHECK): <non-text-response>")
+
         resp.raise_for_status()
         return resp.json()
+
     except Exception as e:
-        logger.error("Error checking transaction status: %s", e)
+        logger.error("ERROR (STATUS CHECK): %s", e)
         return {"error": str(e)}
+

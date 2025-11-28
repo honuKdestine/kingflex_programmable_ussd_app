@@ -76,3 +76,7 @@ class RetrievalRequest(models.Model):
 
     def __str__(self):
         return f"RetrievalRequest {self.id} {self.name} {self.phone} {self.status}"
+    
+
+
+    
